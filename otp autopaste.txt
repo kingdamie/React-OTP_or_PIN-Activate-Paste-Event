@@ -1,39 +1,55 @@
 import { useState } from "react";
 
-const Otp = () => {
+const OTPVerify = () => {
 	const [otp, setOtp] = useState(new Array(4).fill(""));
 
 	function handleChange(e, index) {
-		if (isNaN(e.target.value)) return false;
+		if (isNaN(e.target.value)) return;
 
 		setOtp([
 			...otp.map((data, indx) => (indx === index ? e.target.value : data)),
 		]);
 
+		// Automatically focus on the next input field
 		if (e.target.value && e.target.nextSibling) {
 			e.target.nextSibling.focus();
 		}
 	}
 
+	function handleKeyDown(e, index) {
+		// Handle backspace
+		if (e.key === "Backspace") {
+			if (otp[index] === "") {
+				// Move focus to the previous input if it exists
+				if (e.target.previousSibling) {
+					e.target.previousSibling.focus();
+				}
+			}
+			setOtp([...otp.map((data, indx) => (indx === index ? "" : data))]);
+		}
+	}
+
 	function handlePaste(e) {
 		const value = e.clipboardData.getData("text");
-		if (isNaN(value)) return false;
+		if (isNaN(value)) return;
 
 		const updatedValue = value.toString().split("").slice(0, otp.length);
 
 		setOtp(updatedValue);
-
 	}
+
 	return (
 		<div>
-			<h1>enter otp</h1>
+			<h1>Enter OTP</h1>
 			{otp.map((data, i) => {
 				return (
 					<input
+						key={i}
 						type="text"
 						value={data}
 						onChange={(e) => handleChange(e, i)}
-                        onPaste={(e) => handlePaste(e)}
+						onKeyDown={(e) => handleKeyDown(e, i)}
+						onPaste={(e) => handlePaste(e)}
 						maxLength={1}
 					/>
 				);
@@ -42,4 +58,4 @@ const Otp = () => {
 	);
 };
 
-export default Otp;
+export default OTPVerify;
